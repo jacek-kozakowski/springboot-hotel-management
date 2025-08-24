@@ -30,6 +30,7 @@ public class Reservation {
     private LocalDateTime checkOutDate;
 
     private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
