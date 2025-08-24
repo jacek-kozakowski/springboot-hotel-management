@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -18,17 +20,23 @@ import java.util.Collections;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true, nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String password;
     private boolean enabled;
     private String verificationCode;
     private LocalDateTime verificationExpiration;
+
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Reservation> reservations = new ArrayList<>();
 
     public User(String email, String password) {
         this.email = email;

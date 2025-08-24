@@ -1,10 +1,13 @@
 package com.reservations.hotel.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import jakarta.validation.constraints.Positive;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,10 +15,36 @@ import lombok.Setter;
 @Table(name = "rooms")
 public class Room {
     @Id
-    private String roomNumber;
-    private String type;
-    private double pricePerNight;
-    private boolean isAvailable;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    // Additional fields and methods can be added as needed
+    @Column(unique = true, nullable = false)
+    private Integer roomNumber;
+
+    @Enumerated(EnumType.STRING)
+    private RoomType type;
+
+    @NotNull(message = "Price per night cannot be null")
+    @Positive(message = "Price per night must be positive")
+    private Double pricePerNight;
+
+    @NotNull(message = "Capacity cannot be null")
+    @Positive(message = "Capacity must be positive")
+    private Integer capacity;
+
+    private String description;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Reservation> reservations = new ArrayList<>();
+
+    public Room(Integer roomNumber, RoomType type, Double pricePerNight, Integer capacity, String description) {
+        this.roomNumber = roomNumber;
+        this.type = type;
+        this.pricePerNight = pricePerNight;
+        this.capacity = capacity;
+        this.description = description;
+    }
+
+    public Room() {
+    }
 }
