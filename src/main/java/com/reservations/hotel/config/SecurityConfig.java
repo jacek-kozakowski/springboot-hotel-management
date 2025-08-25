@@ -21,10 +21,19 @@ import java.util.List;
 public class SecurityConfig {
     private final AuthenticationProvider authProvider;
     private final JwtAuthFilter authFilter;
+    private final CustomAuthenticationEntryPoint customAuthEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public SecurityConfig(AuthenticationProvider authProvider, JwtAuthFilter authFilter) {
+    public SecurityConfig(
+            AuthenticationProvider authProvider,
+            JwtAuthFilter authFilter,
+            CustomAuthenticationEntryPoint customAuthEntryPoint,
+            CustomAccessDeniedHandler customAccessDeniedHandler
+    ) {
         this.authProvider = authProvider;
         this.authFilter = authFilter;
+        this.customAuthEntryPoint = customAuthEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -35,7 +44,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authProvider)
-            .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint(customAuthEntryPoint)
+                    .accessDeniedHandler(customAccessDeniedHandler)
+            );
         return http.build();
     }
 

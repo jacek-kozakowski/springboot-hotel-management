@@ -3,9 +3,11 @@ package com.reservations.hotel.services;
 import com.reservations.hotel.dto.LoginDto;
 import com.reservations.hotel.dto.RegisterDto;
 import com.reservations.hotel.dto.VerifyDto;
+import com.reservations.hotel.exceptions.*;
 import com.reservations.hotel.models.User;
 import com.reservations.hotel.repositories.UserRepository;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,16 +31,10 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public User registerUser(RegisterDto input) {
+    public User registerUser(@Valid RegisterDto input) {
         // Check if the user already exists
         if (userRepository.existsByEmail(input.getEmail())) {
-            throw new IllegalArgumentException("User with this email already exists");
-        }
-        if (!isValidEmail(input.getEmail())) {
-            throw new IllegalArgumentException("Invalid email format");
-        }
-        if (input.getPassword() == null || input.getPassword().length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters long");
+            throw new UserAlreadyExistsException("User with this email already exists");
         }
         User newUser = new User(input.getEmail(), passwordEncoder.encode(input.getPassword()));
         newUser.setVerificationCode(generateVerificationCode());
@@ -55,9 +51,9 @@ public class AuthService {
 
     public User authenticate(LoginDto input) {
         User user = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + input.getEmail()));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + input.getEmail()));
         if (!user.isEnabled()) {
-            throw new RuntimeException("User account is not verified. Please check your email for verification link.");
+            throw new UserNotVerifiedException("User account is not verified. Please check your email for verification link.");
         }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword())
@@ -71,10 +67,10 @@ public class AuthService {
         if (userOptional.isPresent()){
             User user = userOptional.get();
             if(user.isEnabled()){
-                throw new RuntimeException("User account is already verified.");
+                throw new UserAlreadyVerifiedException("User account is already verified.");
             }
             if (user.getVerificationExpiration().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Verification code has expired. Please request a new verification code.");
+                throw new VerificationExpiredException("Verification code has expired. Please request a new verification code.");
             }
             if (user.getVerificationCode().equals(input.getVerificationCode())) {
                 user.setEnabled(true);
@@ -82,10 +78,10 @@ public class AuthService {
                 user.setVerificationExpiration(null);
                 userRepository.save(user);
             } else {
-                throw new RuntimeException("Invalid verification code.");
+                throw new InvalidVerificationCodeException("Invalid verification code.");
             }
         }else{
-            throw new RuntimeException("User not found with email: " + input.getEmail());
+            throw new UserNotFoundException("User not found with email: " + input.getEmail());
         }
     }
     public void resendVerificationCode(String email) {
@@ -93,14 +89,14 @@ public class AuthService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (user.isEnabled()) {
-                throw new RuntimeException("User account is already verified.");
+                throw new UserAlreadyVerifiedException("User account is already verified.");
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationExpiration(LocalDateTime.now().plusMinutes(15));
             sendVerificationEmail(user);
             userRepository.save(user);
         } else {
-            throw new RuntimeException("User not found with email: " + email);
+            throw new UserNotFoundException("User not found with email: " + email);
         }
     }
 
