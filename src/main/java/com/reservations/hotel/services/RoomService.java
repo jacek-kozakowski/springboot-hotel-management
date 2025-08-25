@@ -29,18 +29,7 @@ public class RoomService {
         return roomRepository.findByRoomNumber(roomNumber)
                 .orElseThrow(() -> new RuntimeException("Room not found with number: " + roomNumber));
     }
-    public List<Room> getRoomsByType(RoomType type) {
-        return roomRepository.findRoomsByType(type);
-    }
-    public List<Room> getRoomsByCapacity(Integer minCapacity) {
-        return roomRepository.findRoomsByCapacityIsGreaterThanEqual(minCapacity);
-    }
-    public List<Room> getRoomsByCapacityAndPrice(Integer minCapacity, Double maxPricePerNight) {
-        return roomRepository.findRoomsByCapacityIsGreaterThanEqualAndPricePerNightIsLessThanEqual(minCapacity, maxPricePerNight);
-    }
-    public List<Room> getRoomsByMaxPrice(Double maxPricePerNight) {
-        return roomRepository.findRoomsByPricePerNightIsLessThanEqual(maxPricePerNight);
-    }
+
 
     // Available rooms within a price range
     public boolean isRoomAvailable(Long roomId, LocalDate startDate, LocalDate endDate) {
@@ -106,5 +95,10 @@ public class RoomService {
                         (minCapacity == null || room.getCapacity() >= minCapacity) &&
                         (maxPricePerNight == null || room.getPricePerNight() <= maxPricePerNight))
                 .collect(Collectors.toList());
+    }
+
+    public Room getRoomByRoomId(Long roomId) {
+        return roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
     }
 }

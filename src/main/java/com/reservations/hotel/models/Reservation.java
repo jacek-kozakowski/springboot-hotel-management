@@ -1,5 +1,6 @@
 package com.reservations.hotel.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "reservations")
+@JsonIgnoreProperties({"user", "room"})
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
