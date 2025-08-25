@@ -45,7 +45,7 @@ public class ReservationController {
     @PostMapping("/confirm_reservation/{reservationId}")
     public ResponseEntity<Reservation> confirmReservation(@PathVariable Long reservationId) {
 
-        if (!isReservationOwner(reservationId)) {
+        if (isNotReservationOwner(reservationId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -56,7 +56,7 @@ public class ReservationController {
     @PostMapping("/cancel_reservation/{reservationId}")
     public ResponseEntity<Reservation> cancelReservation(@PathVariable Long reservationId) {
 
-        if (!isReservationOwner(reservationId)) {
+        if (isNotReservationOwner(reservationId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -64,10 +64,10 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(cancelledReservation);
     }
 
-    private boolean isReservationOwner(Long reservationId) {
+    private boolean isNotReservationOwner(Long reservationId) {
         User user = getCurrentUser();
         return user.getReservations().stream()
-                .anyMatch(r -> r.getId().equals(reservationId));
+                .noneMatch(r -> r.getId().equals(reservationId));
     }
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
