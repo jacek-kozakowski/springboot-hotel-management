@@ -4,13 +4,12 @@ import com.reservations.hotel.dto.RoomCreateDto;
 import com.reservations.hotel.models.Room;
 import com.reservations.hotel.models.RoomType;
 import com.reservations.hotel.services.RoomService;
-import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -33,8 +32,11 @@ public class RoomController {
                                                   @RequestParam(required = false) RoomType type,
                                                   @RequestParam(required = false) Integer minCapacity,
                                                   @RequestParam(required = false) Double maxPricePerNight,
-                                                  @RequestParam(required = false) LocalDateTime checkInDate,
-                                                  @RequestParam(required = false) LocalDateTime checkOutDate) {
+                                                  @RequestParam(required = false) LocalDate checkInDate,
+                                                  @RequestParam(required = false) LocalDate checkOutDate) {
+        System.out.println("DEBUG: roomNumber=" + roomNumber + ", type=" + type + ", minCapacity=" + minCapacity +
+                ", maxPricePerNight=" + maxPricePerNight + ", checkInDate=" + checkInDate + ", checkOutDate=" + checkOutDate);
+
         if (roomNumber == null && type == null && minCapacity == null && maxPricePerNight == null && checkInDate == null && checkOutDate == null) {
             return ResponseEntity.ok(roomService.getAllRooms());
         }
@@ -45,35 +47,8 @@ public class RoomController {
             Room room = roomService.getRoomByRoomNumber(roomNumber);
             return ResponseEntity.ok(List.of(room));
         }
-        boolean checkForAvailability = checkInDate != null;
-        if (checkForAvailability) {
-            if (type != null && minCapacity == null && maxPricePerNight == null) {
-                List<Room> rooms = roomService.getAvailableRoomsByType(type, checkInDate, checkOutDate);
-                return ResponseEntity.ok(rooms);
-            }
-            if (type == null && minCapacity != null && maxPricePerNight == null) {
-                List<Room> rooms = roomService.getAvailableRoomsByCapacity(minCapacity, checkInDate, checkOutDate);
-                return ResponseEntity.ok(rooms);
-            }
-            if (type == null && minCapacity == null && maxPricePerNight != null) {
-                List<Room> rooms = roomService.getAvailableRoomsByMaxPrice(maxPricePerNight, checkInDate, checkOutDate);
-                return ResponseEntity.ok(rooms);
-            }
-        }else{
-            if (type != null && minCapacity == null && maxPricePerNight == null) {
-                List<Room> rooms = roomService.getRoomsByType(type);
-                return ResponseEntity.ok(rooms);
-            }
-            if (type == null && minCapacity != null && maxPricePerNight == null) {
-                List<Room> rooms = roomService.getRoomsByCapacity(minCapacity);
-                return ResponseEntity.ok(rooms);
-            }
-            if (type == null && minCapacity == null && maxPricePerNight != null) {
-                List<Room> rooms = roomService.getRoomsByMaxPrice(maxPricePerNight);
-                return ResponseEntity.ok(rooms);
-            }
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(List.of());
+        List<Room> rooms = roomService.getSpecificRooms(type, minCapacity, maxPricePerNight, checkInDate, checkOutDate);
+        return ResponseEntity.status(HttpStatus.OK).body(rooms);
     }
 
 

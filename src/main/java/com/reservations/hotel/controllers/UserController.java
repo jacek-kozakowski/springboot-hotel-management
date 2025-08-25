@@ -1,6 +1,5 @@
 package com.reservations.hotel.controllers;
 
-import com.reservations.hotel.models.Role;
 import com.reservations.hotel.models.User;
 import com.reservations.hotel.services.UserService;
 import org.springframework.http.ResponseEntity;

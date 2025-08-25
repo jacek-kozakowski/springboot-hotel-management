@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -25,16 +26,16 @@ public class Reservation {
     private Room room;
 
     @Column(nullable = false)
-    private LocalDateTime checkInDate;
+    private LocalDate checkInDate;
     @Column(nullable = false)
-    private LocalDateTime checkOutDate;
+    private LocalDate checkOutDate;
 
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    public Reservation(@NonNull User user, @NonNull Room room, @NonNull LocalDateTime checkInDate, @NonNull LocalDateTime checkOutDate) {
+    public Reservation(@NonNull User user, @NonNull Room room, @NonNull LocalDate checkInDate, @NonNull LocalDate checkOutDate) {
         this.user = user;
         this.room = room;
         this.checkInDate = checkInDate;
