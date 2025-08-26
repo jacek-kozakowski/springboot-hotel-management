@@ -51,7 +51,7 @@ public class ReservationController {
         Reservation createdReservation = reservationService.createReservation(user.getId(), input);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdReservation);
     }
-    @PostMapping("/confirm-reservation/{reservationId}")
+    @PatchMapping("/confirm-reservation/{reservationId}")
     public ResponseEntity<Reservation> confirmReservation(@PathVariable Long reservationId) {
 
         if (isNotReservationOwner(reservationId)) {
@@ -62,7 +62,7 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(confirmedReservation);
     }
 
-    @PostMapping("/cancel-reservation/{reservationId}")
+    @PatchMapping("/cancel-reservation/{reservationId}")
     public ResponseEntity<Reservation> cancelReservation(@PathVariable Long reservationId) {
 
         if (isNotReservationOwner(reservationId)) {

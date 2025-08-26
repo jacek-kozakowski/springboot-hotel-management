@@ -1,7 +1,6 @@
 package com.reservations.hotel.config;
 
 import com.reservations.hotel.exceptions.*;
-import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

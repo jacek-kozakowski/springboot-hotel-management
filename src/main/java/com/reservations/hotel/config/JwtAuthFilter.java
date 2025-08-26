@@ -2,7 +2,6 @@ package com.reservations.hotel.config;
 
 import com.reservations.hotel.services.CustomUserDetailsService;
 import com.reservations.hotel.services.JwtService;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

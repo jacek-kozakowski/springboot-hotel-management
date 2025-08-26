@@ -3,7 +3,6 @@ package com.reservations.hotel.services;
 import com.reservations.hotel.exceptions.UserNotFoundException;
 import com.reservations.hotel.models.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.reservations.hotel.repositories.UserRepository;
 

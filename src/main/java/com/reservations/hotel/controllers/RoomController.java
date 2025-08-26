@@ -2,7 +2,6 @@ package com.reservations.hotel.controllers;
 
 import com.reservations.hotel.dto.RoomCreateDto;
 import com.reservations.hotel.dto.RoomResponseDto;
-import com.reservations.hotel.exceptions.InvalidSearchParametersException;
 import com.reservations.hotel.models.Room;
 import com.reservations.hotel.models.RoomType;
 import com.reservations.hotel.services.RoomService;
