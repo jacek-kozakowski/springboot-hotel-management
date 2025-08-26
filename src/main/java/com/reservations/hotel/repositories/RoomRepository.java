@@ -22,4 +22,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findRoomsByTypeAndCapacityIsGreaterThanEqual(RoomType type, Integer minCapacity);
 
     List<Room> findRoomsByTypeAndPricePerNightIsLessThanEqual(RoomType type, Double maxPricePerNight);
+
+    boolean existsByRoomNumber(Integer roomNumber);
 }

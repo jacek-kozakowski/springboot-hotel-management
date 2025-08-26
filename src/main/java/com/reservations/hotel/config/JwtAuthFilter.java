@@ -2,6 +2,7 @@ package com.reservations.hotel.config;
 
 import com.reservations.hotel.services.CustomUserDetailsService;
 import com.reservations.hotel.services.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,6 +57,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         }catch (Exception e) {
             handlerExceptionResolver.resolveException(request, response, null, e);
+            return;
         }
 
     }

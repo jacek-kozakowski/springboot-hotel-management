@@ -1,6 +1,7 @@
 package com.reservations.hotel.config;
 
 import com.reservations.hotel.exceptions.*;
+import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +66,26 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<Map<String,Object>> handleReservationNotFoundException(ReservationNotFoundException ex) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+    @ExceptionHandler(InvalidReservationRequestException.class)
+    public ResponseEntity<Map<String,Object>> handleInvalidReservationRequestException(InvalidReservationRequestException ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, ex.getError().getMessage());
+    }
+    @ExceptionHandler(RoomNotFoundException.class)
+    public ResponseEntity<Map<String,Object>> handleRoomNotFoundException(RoomNotFoundException ex) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+    @ExceptionHandler(InvalidSearchParametersException.class)
+    public ResponseEntity<Map<String,Object>> handleInvalidSearchParametersException(InvalidSearchParametersException ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+    @ExceptionHandler(RoomAlreadyExistsException.class)
+    public ResponseEntity<Map<String,Object>> handleRoomAlreadyExistsException(RoomAlreadyExistsException ex) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT, ex.getMessage());
+    }
     private ResponseEntity<Map<String, Object>> buildErrorResponse(Exception ex, HttpStatus httpStatus, String anInternalServerErrorOccurred) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
