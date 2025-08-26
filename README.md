@@ -151,3 +151,6 @@ Run tests with:
 Includes:
 - Unit tests for services  
 - Integration tests for controllers
+
+## Author
+**Jacek Kozakowski** – [LinkedIn](https://www.linkedin.com/in/jacek-kozakowski/)
