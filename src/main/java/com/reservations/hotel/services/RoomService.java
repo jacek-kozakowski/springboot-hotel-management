@@ -1,6 +1,9 @@
 package com.reservations.hotel.services;
 
+import com.reservations.hotel.dto.ReservationDateDto;
 import com.reservations.hotel.dto.RoomCreateDto;
+import com.reservations.hotel.dto.RoomResponseDto;
+import com.reservations.hotel.models.ReservationStatus;
 import com.reservations.hotel.models.Room;
 import com.reservations.hotel.models.RoomType;
 import com.reservations.hotel.repositories.ReservationRepository;
@@ -8,6 +11,7 @@ import com.reservations.hotel.repositories.RoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,12 +25,15 @@ public class RoomService {
         this.reservationRepository = reservationRepository;
     }
 
+    public List<RoomResponseDto> getAllRoomsDto() {
+        return roomRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
+    }
     public List<Room> getAllRooms() {
         return roomRepository.findAll();
     }
 
-    public Room getRoomByRoomNumber(Integer roomNumber) {
-        return roomRepository.findByRoomNumber(roomNumber)
+    public RoomResponseDto getRoomByRoomNumber(Integer roomNumber) {
+        return roomRepository.findByRoomNumber(roomNumber).map(this::convertToDto)
                 .orElseThrow(() -> new RuntimeException("Room not found with number: " + roomNumber));
     }
 
@@ -42,41 +49,17 @@ public class RoomService {
                 .filter(room -> isRoomAvailable(room.getId(), startDate, endDate))
                 .collect(Collectors.toList());
     }
-    public List<Room> getAvailableRoomsByType(RoomType type, LocalDate startDate, LocalDate endDate) {
-        List<Room> availableRooms = getAllAvailableRooms(startDate, endDate);
-        return availableRooms.stream()
-                .filter(room -> room.getType() == type)
-                .collect(Collectors.toList());
-    }
-    public List<Room> getAvailableRoomsByCapacity(Integer minCapacity, LocalDate startDate, LocalDate endDate) {
-        List<Room> availableRooms = getAllAvailableRooms(startDate, endDate);
-        return availableRooms.stream()
-                .filter(room -> room.getCapacity() >= minCapacity)
-                .collect(Collectors.toList());
-    }
-    public List<Room> getAvailableRoomsByCapacityAndPrice(Integer minCapacity, Double maxPricePerNight, LocalDate startDate, LocalDate endDate) {
-        List<Room> availableRooms = getAllAvailableRooms(startDate, endDate);
-        return availableRooms.stream()
-                .filter(room -> room.getCapacity() >= minCapacity && room.getPricePerNight() <= maxPricePerNight)
-                .collect(Collectors.toList());
-    }
-    public List<Room> getAvailableRoomsByMaxPrice(Double maxPricePerNight, LocalDate startDate, LocalDate endDate) {
-        List<Room> availableRooms = getAllAvailableRooms(startDate, endDate);
-        return availableRooms.stream()
-                .filter(room -> room.getPricePerNight() <= maxPricePerNight)
-                .collect(Collectors.toList());
-    }
 
     public Room addRoom(RoomCreateDto input) {
         Room room = new Room(input.getRoomNumber(), input.getRoomType(), input.getPricePerNight(), input.getCapacity(), input.getDescription());
         return roomRepository.save(room);
     }
 
-    public List<Room> getSpecificRooms(RoomType type, Integer minCapacity, Double maxPricePerNight, LocalDate checkInDate, LocalDate checkOutDate){
+    public List<RoomResponseDto> getSpecificRoomsDto(RoomType type, Integer minCapacity, Double maxPricePerNight, LocalDate checkInDate, LocalDate checkOutDate){
         if(checkInDate != null && checkOutDate != null) {
-            return getAvailableRoomsWithFilters(type, minCapacity, maxPricePerNight, checkInDate, checkOutDate);
+            return getAvailableRoomsWithFilters(type, minCapacity, maxPricePerNight, checkInDate, checkOutDate).stream().map(this::convertToDto).collect(Collectors.toList());
         }else{
-            return getRoomsWithFilters(type, minCapacity, maxPricePerNight);
+            return getRoomsWithFilters(type, minCapacity, maxPricePerNight).stream().map(this::convertToDto).collect(Collectors.toList());
         }
 
     }
@@ -97,8 +80,21 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
+    public RoomResponseDto getRoomDtoByRoomId(Long roomId) {
+        return roomRepository.findById(roomId).map(this::convertToDto)
+                .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
+    }
     public Room getRoomByRoomId(Long roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
+    }
+
+    private RoomResponseDto convertToDto(Room room) {
+        List<ReservationDateDto> bookedDates = reservationRepository.findByRoomId(room.getId()).stream()
+                .filter(reservation -> !Arrays.asList(ReservationStatus.CANCELLED, ReservationStatus.COMPLETED)
+                        .contains(reservation.getStatus()))
+                .map(reservation -> new ReservationDateDto(reservation.getCheckInDate(), reservation.getCheckOutDate()))
+                .toList();
+        return new RoomResponseDto(room, bookedDates);
     }
 }

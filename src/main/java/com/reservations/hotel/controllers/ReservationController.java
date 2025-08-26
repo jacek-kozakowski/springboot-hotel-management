@@ -1,10 +1,12 @@
 package com.reservations.hotel.controllers;
 
 import com.reservations.hotel.dto.ReservationCreateDto;
+import com.reservations.hotel.dto.ReservationResponseDto;
 import com.reservations.hotel.models.Reservation;
 import com.reservations.hotel.models.User;
 import com.reservations.hotel.services.ReservationService;
 import com.reservations.hotel.services.UserService;
+import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,16 +26,16 @@ public class ReservationController {
         this.userService = userService;
     }
     @GetMapping("/my_reservations")
-    public ResponseEntity<List<Reservation>> getMyReservations() {
+    public ResponseEntity<List<ReservationResponseDto>> getMyReservations() {
         User user = getCurrentUser();
-        List<Reservation> reservations = reservationService.getUserReservations(user.getId());
+        List<ReservationResponseDto> reservations = reservationService.getUserReservationsDto(user.getId());
         return ResponseEntity.ok(reservations);
     }
     @GetMapping("/get_reservations/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<Reservation>> getUserReservations(@PathVariable Long userId) {
+    public ResponseEntity<List<ReservationResponseDto>> getUserReservations(@PathVariable @NonNull Long userId) {
         User user = userService.getUserById(userId);
-        List<Reservation> reservations = reservationService.getUserReservations(user.getId());
+        List<ReservationResponseDto> reservations = reservationService.getUserReservationsDto(user.getId());
         return ResponseEntity.ok(reservations);
     }
     @PostMapping("/reserve_room")

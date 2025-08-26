@@ -1,17 +1,18 @@
 package com.reservations.hotel.services;
 
 import com.reservations.hotel.dto.ReservationCreateDto;
+import com.reservations.hotel.dto.ReservationResponseDto;
 import com.reservations.hotel.models.Reservation;
 import com.reservations.hotel.models.ReservationStatus;
 import com.reservations.hotel.models.Room;
 import com.reservations.hotel.models.User;
 import com.reservations.hotel.repositories.ReservationRepository;
-import com.reservations.hotel.repositories.RoomRepository;
-import com.reservations.hotel.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class ReservationService {
@@ -25,6 +26,12 @@ public class ReservationService {
     }
     public List<Reservation> getUserReservations(Long userId) {
         return reservationRepository.findByUserId(userId);
+    }
+
+    public List<ReservationResponseDto> getUserReservationsDto(Long userId) {
+        List<Reservation> reservations = reservationRepository.findByUserId(userId);
+        return reservations.stream()
+                .map(this::convertToDto).toList();
     }
     public Reservation createReservation(Long userId, ReservationCreateDto reservationDto) {
         User user = userService.getUserById(userId);
@@ -66,5 +73,8 @@ public class ReservationService {
         if (checkIn.isEqual(checkOut)) {
             throw new RuntimeException("Minimum stay is 1 night");
         }
+    }
+    private ReservationResponseDto convertToDto(Reservation reservation) {
+        return new ReservationResponseDto(reservation);
     }
 }
