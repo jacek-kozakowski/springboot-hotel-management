@@ -1,7 +1,7 @@
 
 # 🏨 Hotel Reservation System
 
-A comprehensive Spring Boot-based hotel reservation system with JWT authentication, email verification, and role-based access control.
+A comprehensive Spring Boot-based backend for hotel reservation system with JWT authentication, email verification, and role-based access control.
 
 ## ✨ Features
 
