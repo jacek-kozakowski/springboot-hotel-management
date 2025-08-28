@@ -1,4 +1,3 @@
-
 # 🏨 Hotel Reservation System
 
 A comprehensive Spring Boot-based backend for hotel reservation system with JWT authentication, email verification, and role-based access control.
@@ -41,6 +40,8 @@ cd springboot-hotel-management
 
 2. **Set Java version**
 
+Make sure you set Java to Java 21.
+
 **MacOS:**
 ```bash
 export JAVA_HOME=$(/usr/libexec/java_home -v 21)
@@ -68,6 +69,8 @@ ALTER DATABASE hotel_db OWNER TO hotel_user;
 \q
 ```
 
+Alternatively you set up the database in your IDE. 
+
 4. **Set up `application.properties` credentials**
 ```properties
 # Database
@@ -78,12 +81,37 @@ spring.datasource.password=password123
 # JWT secret key
 jwt.secret=YourSecretKeyHere
 
-# Optional: mail credentials
-spring.mail.username=your-email@gmail.com
+# Mail credentials
+spring.mail.username=your.email@gmail.com
 spring.mail.password=your-app-password
 ```
 
-Or you can configure the properties with a `.env` file.
+Alternatively you can configure the properties with a `.env` file.
+```dotenv
+DATABASE_URL=jdbc:postgresql://localhost:5432/hotel_db
+DATABASE_USERNAME=hotel_user
+DATABASE_PASSWORD=password123
+JWT_SECRET=YourSecretJwtKey
+MAIL_USERNAME=your.email@gmail.com
+MAIL_PASSWORD=your-app-password
+```
+And then set your `application.properties`:
+```properties
+# Allows you to import your credentials from .env file
+spring.config.import=optional:file:.env[.properties]
+
+# Database
+spring.datasource.url=${DATABASE_URL}
+spring.datasource.username=${DATABASE_USERNAME}
+spring.datasource.password=${DATABASE_PASSWORD}
+
+# JWT secret key
+security.jwt.secret-key=${JWT_SECRET}
+
+# Mail credentials
+spring.mail.username=${MAIL_USERNAME}
+spring.mail.password=${MAIL_PASSWORD}
+```
 
 5. **Run the application**
 
@@ -120,7 +148,10 @@ src/
 
 ### User
 - `GET /users/me` - Retrieves current user's data
-- `GET /users/get-users/{userId}` - Retrieves specific user's data
+- `GET /users/me/reservations` - Retrieves current user's reservations
+- `GET /users` - Retrieves all users (Admin only)
+- `GET /users/{userId}` - Retrieves specific user's data (Admin only)
+- `GET /users/{userId}/reservations` - Retrieves specific user's reservations (Admin only)
 
 ### Authentication
 - `POST /auth/register` - Register new user  
@@ -129,17 +160,39 @@ src/
 - `POST /auth/resend` - Resend verification code  
 
 ### Rooms
-- `GET /rooms/all` - Get all rooms (Admin only)  
-- `GET /rooms/room` - Search/filter rooms  
+- `GET /rooms` - Search/filter rooms (if no params, returns all)
   - Params: `roomNumber`, `type`, `minCapacity`, `maxPricePerNight`, `checkInDate`, `checkOutDate`
-- `POST /rooms/create-room` - Add new room (Admin only)  
+- `POST /rooms` - Add new room (Admin only)  
+- `PATCH /rooms/{roomId}` - Update room details (Admin only)
+- `DELETE /rooms/{roomId}` - Delete room (Admin only)
 
 ### Reservations
-- `GET /reservations/my-reservations` - Get user's reservations
-- `GET /reservations/get-reservations/{userId}` - Retrieve specific user's reservations (Admin only)
-- `POST /reserve-room` - Create new reservation  
-- `PATCH /confirm-reservation/{reservationId}` - Confirm reservation  
-- `PATCH /cancel-reservation/{reservationId}` - Cancel reservation  
+- `POST /reservations` - Create new reservation  
+- `PATCH /reservations/{reservationId}/confirm` - Confirm reservation 
+- `PATCH /reservations/{reservationId}/cancel` - Cancel reservation  
+
+## Usage Examples
+### Register User
+```http request
+POST /auth/register
+Content-Type: application/json
+```
+Request:
+```json
+{
+  "email":"test@example.com",
+  "password":"secret123"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "email": "test@example.com",
+  "role": "USER",
+  "enabled": false
+}
+```
 
 ## 🧪 Testing
 

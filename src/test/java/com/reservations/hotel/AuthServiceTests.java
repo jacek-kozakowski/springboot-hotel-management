@@ -2,6 +2,7 @@ package com.reservations.hotel;
 
 import com.reservations.hotel.dto.LoginDto;
 import com.reservations.hotel.dto.RegisterDto;
+import com.reservations.hotel.dto.UserResponseDto;
 import com.reservations.hotel.dto.VerifyDto;
 import com.reservations.hotel.exceptions.UserAlreadyExistsException;
 import com.reservations.hotel.models.User;
@@ -10,6 +11,7 @@ import com.reservations.hotel.services.EmailService;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -48,25 +50,35 @@ public class AuthServiceTests {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
 
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
-            User userToSave = invocation.getArgument(0);
-            return userToSave;
-        });
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User result = authService.registerUser(registerDto);
+        UserResponseDto response = authService.registerUser(registerDto);
 
-        assertNotNull(result);
-        assertEquals("test@example.com", result.getEmail());
-        assertEquals("encodedPassword", result.getPassword());
-        assertFalse(result.isEnabled());
-        assertNotNull(result.getVerificationCode());
-        assertNotNull(result.getVerificationExpiration());
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
 
+        User savedUser = userCaptor.getValue();
+
+        assertEquals("test@example.com", savedUser.getEmail());
+        assertEquals("encodedPassword", savedUser.getPassword());
+        assertFalse(savedUser.isEnabled());
+        assertNotNull(savedUser.getVerificationCode());
+        assertNotNull(savedUser.getVerificationExpiration());
+
+        // sprawdzamy, że save i emailService zostały wywołane
         verify(userRepository).existsByEmail("test@example.com");
         verify(passwordEncoder).encode("password123");
-        verify(userRepository).save(any(User.class));
-        verify(emailService).sendVerificationEmail(anyString(), anyString(), anyString());
+        verify(emailService).sendVerificationEmail(
+                eq(savedUser.getEmail()),
+                anyString(),
+                anyString()
+        );
+
+        // dodatkowo możemy sprawdzić, że response DTO ma poprawny ID/email
+        assertEquals(savedUser.getId(), response.getId());
+        assertEquals(savedUser.getEmail(), response.getEmail());
     }
+
 
     @Test
     void registerUser_ShouldThrowException_WhenUserAlreadyExists() throws MessagingException {

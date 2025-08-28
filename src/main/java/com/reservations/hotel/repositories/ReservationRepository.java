@@ -30,4 +30,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     );
 
     List<Reservation> findByStatusAndCheckOutDateBefore(ReservationStatus reservationStatus, LocalDate today);
+    boolean existsByRoomIdAndStatus(Long roomId, ReservationStatus status);
 }

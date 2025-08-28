@@ -11,8 +11,9 @@ import java.util.List;
 
 @Getter
 @Setter
-@JsonPropertyOrder({ "roomNumber", "type", "pricePerNight", "capacity", "description", "bookedDates" })
+@JsonPropertyOrder({ "id", "roomNumber", "type", "pricePerNight", "capacity", "description", "bookedDates" })
 public class RoomResponseDto {
+    private Long id;
     private Integer roomNumber;
     private RoomType type;
     private Double pricePerNight;
@@ -21,6 +22,7 @@ public class RoomResponseDto {
     private List<ReservationDateDto> bookedDates;
 
     public RoomResponseDto(Room room, List<ReservationDateDto> bookedDates) {
+        this.id = room.getId();
         this.roomNumber = room.getRoomNumber();
         this.type = room.getType();
         this.pricePerNight = room.getPricePerNight();

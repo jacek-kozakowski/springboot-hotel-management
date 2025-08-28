@@ -1,5 +1,7 @@
 package com.reservations.hotel.services;
 
+import com.reservations.hotel.dto.AdminViewUserDto;
+import com.reservations.hotel.dto.UserResponseDto;
 import com.reservations.hotel.exceptions.UserNotFoundException;
 import com.reservations.hotel.models.User;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +20,21 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getSpecificUsers(Long userId) {
-        if (userId != null) {
-            return List.of(getUserById(userId));
-        } else {
-            return getAllUsers().stream().sorted(Comparator.comparing(User::getId)).toList();
-        }
+    public AdminViewUserDto getSpecificUsers(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("User with ID {} not found", userId);
+                    return new UserNotFoundException("User not found");
+                });
+        return new AdminViewUserDto(user);
     }
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+    public List<AdminViewUserDto> getAllUsersForAdmin() {
+        List<User> users = userRepository.findAll();
+        users.sort(Comparator.comparing(User::getId));
+        return users.stream().map(AdminViewUserDto::new).toList();
     }
     public User getUserById(Long id) {
         log.info("Fetching user with ID: {}", id);
@@ -35,19 +43,20 @@ public class UserService {
                     log.warn("User with ID {} not found", id);
                     return new UserNotFoundException("User not found");});
     }
-    public User getUserByEmail(String email) {
-        log.info("Fetching user with email: {}", email);
-        return userRepository.findByEmail(email)
-                .orElseThrow(() ->{
-                    log.warn("User with email {} not found", email);
-                    return new UserNotFoundException("User not found");});
-    }
     public User getCurrentUser(String email) {
         log.info("Fetching current user with email: {}", email);
         return userRepository.findByEmail(email)
                 .orElseThrow(() ->{
             log.warn("User with email {} not found", email);
             return new UserNotFoundException("User not found");});
+    }
+    public UserResponseDto getCurrentUserDto(String email) {
+        User user = getCurrentUser(email);
+        return convertToDto(user);
+    }
+
+    private UserResponseDto convertToDto(User user) {
+        return new UserResponseDto(user);
     }
 
 }

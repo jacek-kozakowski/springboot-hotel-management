@@ -1,14 +1,11 @@
 package com.reservations.hotel.controllers;
 
-import com.reservations.hotel.dto.LoginDto;
-import com.reservations.hotel.dto.RegisterDto;
-import com.reservations.hotel.dto.VerifyDto;
+import com.reservations.hotel.dto.*;
 import com.reservations.hotel.exceptions.InvalidVerificationCodeException;
 import com.reservations.hotel.exceptions.UserAlreadyVerifiedException;
 import com.reservations.hotel.exceptions.UserNotFoundException;
 import com.reservations.hotel.exceptions.VerificationExpiredException;
 import com.reservations.hotel.models.User;
-import com.reservations.hotel.responses.LoginResponse;
 import com.reservations.hotel.services.AuthService;
 import com.reservations.hotel.services.JwtService;
 import jakarta.validation.Valid;
@@ -34,19 +31,19 @@ public class AuthController {
         this.authenticationService = authenticationService;
     }
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid RegisterDto user) {
+    public ResponseEntity<UserResponseDto> register(@RequestBody @Valid RegisterDto user) {
         log.info("POST /auth/register: Registering user with email: {}", user.getEmail());
-        User registeredUser = authenticationService.registerUser(user);
+        UserResponseDto registeredUser = authenticationService.registerUser(user);
         log.debug("POST /auth/register User registered with ID: {}", registeredUser.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
     }
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody @Valid LoginDto user) {
+    public ResponseEntity<LoginResponseDto> authenticate(@RequestBody @Valid LoginDto user) {
         log.info("POST /auth/login: Authenticating user with email: {}", user.getEmail());
         User authenticatedUser = authenticationService.authenticate(user);
         String token = jwtService.generateToken(authenticatedUser);
         long expiresIn = jwtService.getExpirationTime();
-        LoginResponse response = new LoginResponse(token, expiresIn);
+        LoginResponseDto response = new LoginResponseDto(token, expiresIn);
         log.debug("POST /auth/login User authenticated with ID: {}", authenticatedUser.getId());
         return ResponseEntity.ok(response);
     }

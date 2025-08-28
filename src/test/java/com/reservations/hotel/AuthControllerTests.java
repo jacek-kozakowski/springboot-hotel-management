@@ -5,6 +5,7 @@ import com.reservations.hotel.config.JwtAuthFilter;
 import com.reservations.hotel.config.TestSecurityConfig;
 import com.reservations.hotel.controllers.AuthController;
 import com.reservations.hotel.dto.RegisterDto;
+import com.reservations.hotel.dto.UserResponseDto;
 import com.reservations.hotel.models.User;
 import com.reservations.hotel.services.AuthService;
 import com.reservations.hotel.services.JwtService;
@@ -51,23 +52,29 @@ public class AuthControllerTests {
 
     @Test
     void registerUser_ShouldReturnCreatedStatus_WhenDataIsValid() throws Exception {
+        // given
         RegisterDto registerDto = new RegisterDto();
         registerDto.setEmail("test@example.com");
         registerDto.setPassword("password123");
 
-        User mockUser = new User();
-        mockUser.setId(1L);
-        mockUser.setEmail(registerDto.getEmail());
+        // mockowane DTO, tak jak zwraca endpoint
+        UserResponseDto mockResponse = new UserResponseDto();
+        mockResponse.setId(1L);
+        mockResponse.setEmail("test@example.com");
 
-        when(authService.registerUser(any(RegisterDto.class))).thenReturn(mockUser);
+        when(authService.registerUser(any(RegisterDto.class))).thenReturn(mockResponse);
 
+        // when / then
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerDto)))
                 .andExpect(status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("test@example.com"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("test@example.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
 
+        // verify
         verify(authService).registerUser(any(RegisterDto.class));
     }
+
 
 }

@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
+    Optional<Room> findById(Long roomId);
     Optional<Room> findByRoomNumber(Integer roomNumber);
     List<Room> findRoomsByType(RoomType type);
     List<Room> findRoomsByCapacityIsGreaterThanEqual(Integer minCapacity);

@@ -40,7 +40,7 @@ public class ReservationService {
                 .map(this::convertToDto).toList();
     }
     @Transactional
-    public Reservation createReservation(Long userId, ReservationCreateDto reservationDto) {
+    public ReservationResponseDto createReservation(Long userId, ReservationCreateDto reservationDto) {
         log.info("Creating reservation for user ID: {} with details: {}", userId, reservationDto);
         User user = userService.getUserById(userId);
         Room room = roomService.getRoomByRoomId(reservationDto.getRoomId());
@@ -53,22 +53,26 @@ public class ReservationService {
         }
         Reservation reservation = new Reservation(user, room, reservationDto.getCheckInDate(), reservationDto.getCheckOutDate());
         log.debug("Reservation Created - Reservation details: {}", reservation);
-        return reservationRepository.save(reservation);
+        return convertToDto(reservationRepository.save(reservation));
     }
     @Transactional
-    public Reservation confirmReservation(Long reservationId) {
+    public ReservationResponseDto confirmReservation(Long reservationId) {
         log.info("Confirming reservation ID: {}", reservationId);
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() ->{
                     log.warn("Reservation Confirmation Failed - Reservation ID: {} not found for confirmation", reservationId);
                     return new ReservationNotFoundException("Reservation not found");});
+        if (!reservation.getStatus().equals(ReservationStatus.PENDING)) {
+            log.warn("Reservation Confirmation Failed - Invalid Status - Reservation ID: {} is not in PENDING status", reservationId);
+            throw new InvalidReservationRequestException(ReservationError.INVALID_RESERVATION_STATUS);
+        }
         reservation.setStatus(ReservationStatus.CONFIRMED);
         log.debug("Reservation Confirmed - Reservation details: {}", reservation);
-        return reservationRepository.save(reservation);
+        return convertToDto(reservationRepository.save(reservation));
     }
 
     @Transactional
-    public Reservation cancelReservation(Long reservationId) {
+    public ReservationResponseDto cancelReservation(Long reservationId) {
         log.info("Cancelling reservation ID: {}", reservationId);
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() ->{
@@ -80,7 +84,8 @@ public class ReservationService {
         }
         reservation.setStatus(ReservationStatus.CANCELLED);
         log.debug("Reservation Cancelled - Reservation details: {}", reservation);
-        return reservationRepository.save(reservation);
+
+        return convertToDto(reservationRepository.save(reservation));
     }
 
 

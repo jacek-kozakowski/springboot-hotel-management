@@ -85,6 +85,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String,Object>> handleRoomAlreadyExistsException(RoomAlreadyExistsException ex) {
         return buildErrorResponse(ex, HttpStatus.CONFLICT, ex.getMessage());
     }
+    @ExceptionHandler(RoomHasActiveReservationsException.class)
+    public ResponseEntity<Map<String,Object>> handleRoomHasActiveReservationsException(RoomHasActiveReservationsException ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
     private ResponseEntity<Map<String, Object>> buildErrorResponse(Exception ex, HttpStatus httpStatus, String anInternalServerErrorOccurred) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());

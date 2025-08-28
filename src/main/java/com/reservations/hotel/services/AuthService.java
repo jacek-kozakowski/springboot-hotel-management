@@ -2,6 +2,7 @@ package com.reservations.hotel.services;
 
 import com.reservations.hotel.dto.LoginDto;
 import com.reservations.hotel.dto.RegisterDto;
+import com.reservations.hotel.dto.UserResponseDto;
 import com.reservations.hotel.dto.VerifyDto;
 import com.reservations.hotel.exceptions.*;
 import com.reservations.hotel.models.User;
@@ -34,7 +35,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public User registerUser(@Valid RegisterDto input) {
+    public UserResponseDto registerUser(@Valid RegisterDto input) {
         log.info("Registering user with email: {}", input.getEmail());
         // Check if the user already exists
         if (userRepository.existsByEmail(input.getEmail())) {
@@ -46,8 +47,9 @@ public class AuthService {
         newUser.setVerificationExpiration(LocalDateTime.now().plusMinutes(EXPIRATION_TIME_MINUTES));
         newUser.setEnabled(false);
         sendVerificationEmail(newUser);
+        User registeredUser = userRepository.save(newUser);
         log.debug("User registered successfully: {}", newUser);
-        return userRepository.save(newUser);
+        return new UserResponseDto(registeredUser);
     }
 
     public User authenticate(LoginDto input) {

@@ -9,6 +9,7 @@ public enum ReservationError {
     MINIMUM_STAY_ONE_NIGHT("Minimum stay is 1 night."),
     ROOM_NOT_AVAILABLE("The selected room is not available for the given dates."),
     CANCELLATION_TOO_LATE("Cancellations must be made at least 24 hours before check-in."),
+    INVALID_RESERVATION_STATUS("Reservation cannot be modified in its current status.")
     ;
 
     private final String message;

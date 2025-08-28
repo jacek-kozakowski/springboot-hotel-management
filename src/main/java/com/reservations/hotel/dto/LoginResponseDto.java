@@ -1,15 +1,15 @@
-package com.reservations.hotel.responses;
+package com.reservations.hotel.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class LoginResponse {
+public class LoginResponseDto {
     private String token;
     private long expiresIn;
 
-    public LoginResponse(String token, long expiresIn) {
+    public LoginResponseDto(String token, long expiresIn) {
         this.token = token;
         this.expiresIn = expiresIn;
     }

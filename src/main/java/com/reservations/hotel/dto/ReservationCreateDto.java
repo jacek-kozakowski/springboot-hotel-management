@@ -1,5 +1,6 @@
 package com.reservations.hotel.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -20,5 +21,11 @@ public class ReservationCreateDto {
     @NotNull
     @Future
     private LocalDate checkOutDate;
+
+    @AssertTrue(message = "Check out date must be after check in date")
+    public boolean isCheckOutAfterCheckin(){
+        return checkOutDate.isAfter(checkInDate);
+    }
+
 
 }
