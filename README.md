@@ -4,7 +4,7 @@ A comprehensive **Spring Boot-based backend** for a hotel reservation system wit
 
 To demonstrate and test the backend functionality, a simple **React-based frontend** is included for **presentation purposes only**. The frontend is **not production-ready** and **does not reflect my frontend development abilities**.
 
-If you want to test the backend functionality without frontend I strongly suggest using **Postman** but then you have to check examples of **Usage Examples** or structure of data transfer objects. 
+If you want to test the backend functionality without frontend I strongly suggest using **Postman**. Check [Backend README](./backend/README.md) for usage examples. 
 
 ---
 
@@ -61,10 +61,16 @@ java -version
 
 3. **Configure PostgreSQL database**
 You can change the values if necessary.
+
+First you need to log in as your superuser (change postgres to your username).
+```bash
+psql -U postgres
+```
 ```sql
 CREATE DATABASE hotel_db;
 CREATE USER hotel_user WITH PASSWORD 'password123';
 ALTER DATABASE hotel_db OWNER TO hotel_user;
+\q
 ```
 
 4. **Set up `application.properties` or `.env` file**
@@ -203,6 +209,9 @@ If you want to quickly test the admin panel locally (without creating a dedicate
 Table name is `users` and the `role` column stores enum values as strings (`USER`, `ADMIN`). You may also want to enable the account if it is not verified yet.
 
 Run this SQL (adjust the identifier in the WHERE clause):
+```bash
+psql -U postgres -d hotel_db
+```
 
 ```sql
 -- Promote by email
