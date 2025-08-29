@@ -1,6 +1,6 @@
 # 🏨 Hotel Reservation System
 
-A comprehensive **Spring Boot-based backend** for a hotel reservation system with **JWT authentication**, **email verification**, and **role-based access control**. This project is primarily intended to **showcase backend development skills** – including secure authentication, RESTful API design, and integration with a relational database. The main goal of this project is to showcase my skills in building a robust Spring Boot application.
+A comprehensive **Spring Boot-based backend** for a hotel reservation system with **JWT authentication**, **email verification**, and **role-based access control**. This project is primarily intended to **showcase backend development skills** – including secure authentication, RESTful API design, and integration with a relational database.
 
 To demonstrate and test the backend functionality, a simple **React-based frontend** is included for **presentation purposes only**. The frontend is **not production-ready** and **does not reflect my frontend development abilities**.
 
