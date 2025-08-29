@@ -6,7 +6,6 @@ import com.reservations.hotel.config.TestSecurityConfig;
 import com.reservations.hotel.controllers.AuthController;
 import com.reservations.hotel.dto.RegisterDto;
 import com.reservations.hotel.dto.UserResponseDto;
-import com.reservations.hotel.models.User;
 import com.reservations.hotel.services.AuthService;
 import com.reservations.hotel.services.JwtService;
 import org.junit.jupiter.api.Test;

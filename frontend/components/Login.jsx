@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { hotelAPI, apiHelpers } from '../services/api';
 import {
   Box,
@@ -13,7 +15,9 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff, Email, Lock, Hotel } from '@mui/icons-material';
 
-const Login = ({ onLoginSuccess, switchToRegister }) => {
+const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,9 +56,14 @@ const Login = ({ onLoginSuccess, switchToRegister }) => {
       const { token, user } = response.data;
 
       if (token) {
-        apiHelpers.setToken(token);
         setSuccess('Login successful! Redirecting...');
-        setTimeout(() => onLoginSuccess(user, token), 1500);
+        // Immediately update AuthContext and redirect
+        const loginResult = await login(user, token);
+        if (loginResult.success) {
+          navigate('/dashboard');
+        } else {
+          setError(loginResult.error || 'Login failed');
+        }
       } else {
         setError('No token in server response');
       }
@@ -176,7 +185,7 @@ const Login = ({ onLoginSuccess, switchToRegister }) => {
               Don't have an account?{' '}
               <Button
                 variant="text"
-                onClick={switchToRegister}
+                onClick={() => navigate('/register')}
                 disabled={loading}
                 sx={{ textTransform: 'none' }}
               >

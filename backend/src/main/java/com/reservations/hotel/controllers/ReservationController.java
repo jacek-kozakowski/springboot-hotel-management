@@ -2,7 +2,6 @@ package com.reservations.hotel.controllers;
 
 import com.reservations.hotel.dto.ReservationCreateDto;
 import com.reservations.hotel.dto.ReservationResponseDto;
-import com.reservations.hotel.models.Reservation;
 import com.reservations.hotel.models.User;
 import com.reservations.hotel.services.ReservationService;
 import com.reservations.hotel.services.UserService;
@@ -10,10 +9,13 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -26,6 +28,12 @@ public class ReservationController {
     public ReservationController(ReservationService reservationService, UserService userService) {
         this.reservationService = reservationService;
         this.userService = userService;
+    }
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ReservationResponseDto>> getAllReservations() {
+        List<ReservationResponseDto> reservations = reservationService.getAllReservations();
+        return ResponseEntity.status(HttpStatus.OK).body(reservations);
     }
     @PostMapping
     public ResponseEntity<ReservationResponseDto> reserveRoom(@RequestBody @Valid ReservationCreateDto input) {

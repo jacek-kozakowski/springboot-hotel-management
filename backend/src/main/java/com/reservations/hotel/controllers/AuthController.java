@@ -62,14 +62,14 @@ public class AuthController {
     }
 
     @PostMapping("/resend")
-    public ResponseEntity<?> resendVerification(@RequestBody String email) {
-        log.info("POST /auth/resend: Resending verification email to: {}", email);
+    public ResponseEntity<?> resendVerification(@RequestBody EmailRequestDto request) {
+        log.info("POST /auth/resend: Resending verification email to: {}", request.getEmail());
         try {
-            authenticationService.resendVerificationCode(email);
-            log.debug("POST /auth/resend Verification email resent successfully to: {}", email);
+            authenticationService.resendVerificationCode(request.getEmail());
+            log.debug("POST /auth/resend Verification email resent successfully to: {}", request.getEmail());
             return ResponseEntity.ok("Verification email resent successfully");
         } catch (UserAlreadyVerifiedException | UserNotFoundException e) {
-            log.warn("POST /auth/resend Resend failed for email: {}: {}", email, e.getMessage());
+            log.warn("POST /auth/resend Resend failed for email: {}: {}", request.getEmail(), e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -39,6 +39,13 @@ public class ReservationService {
         return reservations.stream()
                 .map(this::convertToDto).toList();
     }
+
+    public List<ReservationResponseDto> getAllReservations() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        return reservations.stream()
+                .map(this::convertToDto).toList();
+    }
+
     @Transactional
     public ReservationResponseDto createReservation(Long userId, ReservationCreateDto reservationDto) {
         log.info("Creating reservation for user ID: {} with details: {}", userId, reservationDto);

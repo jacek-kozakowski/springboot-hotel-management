@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
           const response = await hotelAPI.users.getMe();
           setUser(response.data);
           setIsAuthenticated(true);
-          console.log('User authenticated:', response.data);
+          
         } catch (error) {
           console.error('Token invalid:', error);
           apiHelpers.removeToken();
@@ -40,26 +40,33 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (userData, token) => {
     try {
-      const response = await hotelAPI.auth.login({ email, password });
-      const { token, expiresIn } = response.data;
+      setLoading(true);
+      apiHelpers.setToken(token);
       
-      if (token) {
-        apiHelpers.setToken(token);
+      // Set basic user data fast
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      // Refresh full user data from backend
+      try {
+        const response = await hotelAPI.users.getMe();
+        setUser(response.data);
         
-        const userResponse = await hotelAPI.users.getMe();
-        setUser(userResponse.data);
-        setIsAuthenticated(true);
-        return { success: true, user: userResponse.data };
+      } catch (refreshError) {
+        
+        // Fallback to basic data if refresh fails
       }
       
-      return { success: false, error: 'No token in response' };
+      setLoading(false);
+      return { success: true, user: userData };
     } catch (error) {
+      setLoading(false);
       console.error('Login error:', error);
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Login error' 
+        error: 'Login error' 
       };
     }
   };
@@ -81,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     apiHelpers.removeToken();
     setUser(null);
     setIsAuthenticated(false);
-    console.log('User logged out');
+    
   };
 
   const verifyEmail = async (verificationData) => {

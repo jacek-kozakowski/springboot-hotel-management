@@ -1,193 +1,151 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { CssBaseline, Box, CircularProgress, Typography } from '@mui/material';
+import { CssBaseline, Box } from '@mui/material';
 import { AuthProvider, useAuth } from '../context/AuthContext';
 import Login from '../components/Login';
+import Register from '../components/Register';
+import Dashboard from '../components/Dashboard';
+import RoomSearch from '../components/RoomSearch';
+import MyReservations from '../components/MyReservations';
+import AdminPanel from '../components/AdminPanel';
+import Navigation from '../components/Navigation';
 
+// Create theme
 const theme = createTheme({
   palette: {
     primary: {
       main: '#1976d2',
+      light: '#42a5f5',
+      dark: '#1565c0',
     },
     secondary: {
       main: '#dc004e',
+      light: '#ff5983',
+      dark: '#9a0036',
     },
     background: {
       default: '#f5f5f5',
+      paper: '#ffffff',
     },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h4: {
+      fontWeight: 600,
+    },
+    h5: {
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: 'none',
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        },
+      },
+    },
   },
 });
 
-const AppContent = () => {
-  const { user, loading, isAuthenticated, logout } = useAuth();
-  const [currentView, setCurrentView] = useState('login');
-
-  if (loading) {
-    return (
-      <Box 
-        display="flex" 
-        flexDirection="column"
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="100vh"
-        gap={2}
-      >
-        <CircularProgress size={60} />
-        <Typography variant="h6">Loading...</Typography>
-      </Box>
-    );
-  }
-
+// Protected Route Component
+const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const { user, isAuthenticated } = useAuth();
+  
   if (!isAuthenticated) {
-    return (
-      <Login 
-        onLoginSuccess={(userData, token) => {
-          console.log('Login successful:', userData);
-        }}
-        switchToRegister={() => setCurrentView('register')}
-      />
-    );
+    return <Navigate to="/login" replace />;
   }
+  
+  if (adminOnly && user?.role !== 'ADMIN') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
+
+// Main App Content
+const AppContent = () => {
+  const { isAuthenticated } = useAuth();
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <Box 
-        sx={{ 
-          backgroundColor: 'primary.main', 
-          color: 'white', 
-          p: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
-      >
-        <Typography variant="h5" component="h1">
-          Hotel Manager
-        </Typography>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="body1">
-            Welcome, {user?.firstName || user?.name || user?.email}!
-          </Typography>
-          
-          <button 
-            onClick={logout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: 'transparent',
-              color: 'white',
-              border: '1px solid white',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Logout
-          </button>
-        </Box>
-      </Box>
-
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h4" component="h2" sx={{ mb: 3 }}>
-          Dashboard
-        </Typography>
-        
-        <Box sx={{ 
-          backgroundColor: 'white', 
-          p: 3, 
-          borderRadius: 2, 
-          boxShadow: 1,
-          mb: 3
-        }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            User information:
-          </Typography>
-          <pre style={{ 
-            backgroundColor: '#f5f5f5', 
-            padding: '10px', 
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}>
-            {JSON.stringify(user, null, 2)}
-          </pre>
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          <button 
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#1976d2',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '16px'
-            }}
-          >
-            My Reservations
-          </button>
-          
-          <button 
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#2e7d32',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '16px'
-            }}
-          >
-            Browse Rooms
-          </button>
-          
-          {user?.role === 'ADMIN' && (
-            <button 
-              style={{
-                padding: '12px 24px',
-                backgroundColor: '#ed6c02',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '16px'
-              }}
-            >
-              Admin Panel
-            </button>
-          )}
-        </Box>
-
-        <Box sx={{ 
-          mt: 4, 
-          p: 2, 
-          backgroundColor: '#e8f5e8', 
-          borderRadius: 1,
-          border: '1px solid #4caf50'
-        }}>
-          <Typography variant="body2" color="success.main">
-            Connection to backend API working correctly!
-          </Typography>
-          <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-            Backend: http://localhost:8080 | Frontend: http://localhost:5173
-          </Typography>
-        </Box>
+      {isAuthenticated && <Navigation />}
+      
+      <Box component="main" sx={{ pt: isAuthenticated ? 8 : 0 }}>
+        <Routes>
+          <Route 
+            path="/login" 
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} 
+          />
+          <Route 
+            path="/register" 
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} 
+          />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/rooms" 
+            element={
+              <ProtectedRoute>
+                <RoomSearch />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/reservations" 
+            element={
+              <ProtectedRoute>
+                <MyReservations />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminPanel />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/" 
+            element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} 
+          />
+        </Routes>
       </Box>
     </Box>
   );
 };
 
-function App() {
+// Main App Component
+const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <AppContent />
+        <Router>
+          <AppContent />
+        </Router>
       </AuthProvider>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

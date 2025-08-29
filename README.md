@@ -1,6 +1,12 @@
 # 🏨 Hotel Reservation System
 
-A comprehensive Spring Boot-based backend for hotel reservation system with JWT authentication, email verification, and role-based access control.
+A comprehensive **Spring Boot-based backend** for a hotel reservation system with **JWT authentication**, **email verification**, and **role-based access control**. This project is primarily intended to **showcase backend development skills** – including secure authentication, RESTful API design, and integration with a relational database. The main goal of this project is to showcase my skills in building a robust Spring Boot application.
+
+To demonstrate and test the backend functionality, a simple **React-based frontend** is included for **presentation purposes only**. The frontend is **not production-ready** and **does not reflect my frontend development abilities**.
+
+If you want to test the backend functionality without frontend I strongly suggest using **Postman** but then you have to check examples of **Usage Examples** or structure of data transfer objects. 
+
+---
 
 ## ✨ Features
 
@@ -20,27 +26,26 @@ A comprehensive Spring Boot-based backend for hotel reservation system with JWT 
 - **Lombok** for cleaner code
 - **Maven** build tool
 - **JUnit 5** + **Mockito** for testing
-- **SLF4J** for logging 
+- **SLF4J** for logging
 
-## 🚀 Quick Start
+---
+
+## 🚀 Quick Start (Backend)
 
 ### Prerequisites
 - Java 21
 - Maven 3.6+
 - PostgreSQL 14+
 
-### Installation
-Make sure you have **PostgreSQL** and **psql** installed!
+### Backend Installation
 
 1. **Clone the repository**
 ```bash
 git clone https://github.com/jacek-kozakowski/springboot-hotel-management.git
-cd springboot-hotel-management
+cd springboot-hotel-management/backend
 ```
 
 2. **Set Java version**
-
-Make sure you set Java to Java 21.
 
 **MacOS:**
 ```bash
@@ -54,39 +59,27 @@ $env:JAVA_HOME="C:\Program Files\Java\jdk-21"
 java -version
 ```
 
-3. **Configure database**
-
-Log in as your superuser:
-```bash
-psql -U postgres
-```
-
-In psql use these commands (change the values if needed):
+3. **Configure PostgreSQL database**
+You can change the values if necessary.
 ```sql
 CREATE DATABASE hotel_db;
 CREATE USER hotel_user WITH PASSWORD 'password123';
 ALTER DATABASE hotel_db OWNER TO hotel_user;
-\q
 ```
 
-Alternatively you set up the database in your IDE. 
+4. **Set up `application.properties` or `.env` file**
 
-4. **Set up `application.properties` credentials**
+`application.properties`:
 ```properties
-# Database
 spring.datasource.url=jdbc:postgresql://localhost:5432/hotel_db
 spring.datasource.username=hotel_user
 spring.datasource.password=password123
-
-# JWT secret key
 jwt.secret=YourSecretKeyHere
-
-# Mail credentials
 spring.mail.username=your.email@gmail.com
 spring.mail.password=your-app-password
 ```
 
-Alternatively you can configure the properties with a `.env` file.
+or use `.env`:
 ```dotenv
 DATABASE_URL=jdbc:postgresql://localhost:5432/hotel_db
 DATABASE_USERNAME=hotel_user
@@ -94,23 +87,6 @@ DATABASE_PASSWORD=password123
 JWT_SECRET=YourSecretJwtKey
 MAIL_USERNAME=your.email@gmail.com
 MAIL_PASSWORD=your-app-password
-```
-And then set your `application.properties`:
-```properties
-# Allows you to import your credentials from .env file
-spring.config.import=optional:file:.env[.properties]
-
-# Database
-spring.datasource.url=${DATABASE_URL}
-spring.datasource.username=${DATABASE_USERNAME}
-spring.datasource.password=${DATABASE_PASSWORD}
-
-# JWT secret key
-security.jwt.secret-key=${JWT_SECRET}
-
-# Mail credentials
-spring.mail.username=${MAIL_USERNAME}
-spring.mail.password=${MAIL_PASSWORD}
 ```
 
 5. **Run the application**
@@ -124,6 +100,8 @@ spring.mail.password=${MAIL_PASSWORD}
 ```powershell
 .\mvnw spring-boot:run
 ```
+
+---
 
 ## 📁 Project Structure
 
@@ -144,7 +122,11 @@ src/
 └── test/                   # Unit & integration tests
 ```
 
+---
+
 ## 🔌 API Endpoints
+
+For usage examples check [Backend README](./backend/README.md)
 
 ### User
 - `GET /users/me` - Retrieves current user's data
@@ -154,56 +136,101 @@ src/
 - `GET /users/{userId}/reservations` - Retrieves specific user's reservations (Admin only)
 
 ### Authentication
-- `POST /auth/register` - Register new user  
-- `POST /auth/login` - Login with JWT response  
-- `POST /auth/verify` - Verify email address  
-- `POST /auth/resend` - Resend verification code  
+- `POST /auth/register` - Register new user
+- `POST /auth/login` - Login with JWT response
+- `POST /auth/verify` - Verify email address
+- `POST /auth/resend` - Resend verification code
 
 ### Rooms
 - `GET /rooms` - Search/filter rooms (if no params, returns all)
   - Params: `roomNumber`, `type`, `minCapacity`, `maxPricePerNight`, `checkInDate`, `checkOutDate`
-- `POST /rooms` - Add new room (Admin only)  
+- `POST /rooms` - Add new room (Admin only)
 - `PATCH /rooms/{roomId}` - Update room details (Admin only)
 - `DELETE /rooms/{roomId}` - Delete room (Admin only)
 
 ### Reservations
-- `POST /reservations` - Create new reservation  
-- `PATCH /reservations/{reservationId}/confirm` - Confirm reservation 
-- `PATCH /reservations/{reservationId}/cancel` - Cancel reservation  
+- `POST /reservations` - Create new reservation
+- `PATCH /reservations/{reservationId}/confirm` - Confirm reservation
+- `PATCH /reservations/{reservationId}/cancel` - Cancel reservation
 
-## Usage Examples
-### Register User
-```http request
-POST /auth/register
-Content-Type: application/json
-```
-Request:
-```json
-{
-  "email":"test@example.com",
-  "password":"secret123"
-}
-```
-Response:
-```json
-{
-  "id": 1,
-  "email": "test@example.com",
-  "role": "USER",
-  "enabled": false
-}
+---
+
+## Frontend (For Presentation Purposes Only)
+
+A modern **React frontend** is included to demonstrate the backend functionality. **It is not production-ready**. It was made with help of Cursor and it is solely for **presentation purposes** and does not reflect my full frontend development capabilities.
+
+### Features
+- User registration and login (JWT-based)
+- View rooms and make reservations
+- Admin panel for managing rooms and users
+
+### Technology Stack
+- React 19
+- Material-UI 7
+- React Router 7
+- Axios for API communication
+- Date-fns for date handling
+- Vite as build tool
+
+### Installation
+
+Prerequisites: Node.js 18+ (recommended 20+), npm 9+
+
+1. **Navigate to frontend directory:**
+```bash
+cd frontend
 ```
 
-## 🧪 Testing
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Start development server:**
+```bash
+npm run dev
+```
+
+Notes:
+- Backend must run on port 8080 by default. The API base URL is defined in `frontend/services/api.js` (`API_BASE_URL = 'http://localhost:8080'`). Change it there if your backend runs on a different host/port.
+- Optional: after building (`npm run build`), you can preview with `npm run preview`.
+
+---
+## Granting ADMIN role for testing
+
+If you want to quickly test the admin panel locally (without creating a dedicated endpoint), you can promote any existing user to ADMIN directly in the database.
+
+Table name is `users` and the `role` column stores enum values as strings (`USER`, `ADMIN`). You may also want to enable the account if it is not verified yet.
+
+Run this SQL (adjust the identifier in the WHERE clause):
+
+```sql
+-- Promote by email
+UPDATE users
+SET role = 'ADMIN', enabled = TRUE
+WHERE email = 'tester@example.com';
+
+-- Or promote by ID
+UPDATE users
+SET role = 'ADMIN', enabled = TRUE
+WHERE id = 1;
+```
+
+Notes:
+- Works with H2, PostgreSQL and MySQL when using default schema created by JPA.
+- If you use H2 console, enable it and open `/h2-console` (or use your DB client) and execute the query.
+- Revert back to a normal user by setting `role = 'USER'`.
+---
+
+## 🧪 Testing Backend
 
 Run tests with:
 ```bash
 ./mvnw test
 ```
+Includes unit and integration tests.
 
-Includes:
-- Unit tests for services  
-- Integration tests for controllers
+---
 
 ## Author
 **Jacek Kozakowski** – [LinkedIn](https://www.linkedin.com/in/jacek-kozakowski/)

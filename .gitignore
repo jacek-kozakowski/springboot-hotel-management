@@ -65,3 +65,14 @@ Thumbs.db
 # Frontend build
 frontend/dist/
 frontend/build/
+frontend/dist-ssr/
+frontend/*.local
+
+# Maven test reports
+**/surefire-reports/
+
+# IDE metadata (optional, for Eclipse/IntelliJ)
+.settings/
+.classpath
+.project
+*.iml

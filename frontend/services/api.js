@@ -18,29 +18,23 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log('🚀 API Request:', config.method.toUpperCase(), config.url);
     return config;
   },
   (error) => {
-    console.error('❌ Request Error:', error);
+    
     return Promise.reject(error);
   }
 );
 
 
 api.interceptors.response.use(
-  (response) => {
-    console.log('✅ API Response:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('❌ API Error:', error.response?.status, error.response?.data);
     
     if (error.response?.status === 401) {
 
       localStorage.removeItem('jwt_token');
 
-      console.warn('🔒 Unauthorized - token removed');
     }
     return Promise.reject(error);
   }
@@ -68,13 +62,19 @@ export const hotelAPI = {
   // Room endpoints
   rooms: {
     search: (params) => {
-
+      console.log('🔍 API: Searching rooms with params:', params);
       const cleanParams = Object.fromEntries(
         Object.entries(params || {}).filter(([_, value]) => value !== '' && value != null)
       );
-      return api.get('/rooms', { params: cleanParams });
+      console.log('🧹 API: Cleaned params:', cleanParams);
+      const request = api.get('/rooms', { params: cleanParams });
+      console.log('📤 API: Making request to:', request);
+      return request;
     },
-    getAll: () => api.get('/rooms'), 
+    getAll: () => {
+      console.log('🏨 API: Getting all rooms');
+      return api.get('/rooms');
+    }, 
     create: (roomData) => api.post('/rooms', roomData), // Admin only
     update: (roomId, roomData) => api.patch(`/rooms/${roomId}`, roomData), // Admin only
     delete: (roomId) => api.delete(`/rooms/${roomId}`), // Admin only
@@ -85,6 +85,7 @@ export const hotelAPI = {
     create: (reservationData) => api.post('/reservations', reservationData),
     confirm: (reservationId) => api.patch(`/reservations/${reservationId}/confirm`),
     cancel: (reservationId) => api.patch(`/reservations/${reservationId}/cancel`),
+    getAll: () => api.get('/reservations'), // Admin only
   },
 };
 
