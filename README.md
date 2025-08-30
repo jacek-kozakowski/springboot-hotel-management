@@ -47,6 +47,7 @@ cd springboot-hotel-management
 ```
 
 2. **Configure environment variables**
+
 If you are using gmail you can create your app password from [App passwords](https://myaccount.google.com/apppasswords)
 
 **Option A: Using .env file (Recommended)**
