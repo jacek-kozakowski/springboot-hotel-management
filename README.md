@@ -27,17 +27,84 @@ If you want to test the backend functionality without frontend I strongly sugges
 - **Maven** build tool
 - **JUnit 5** + **Mockito** for testing
 - **SLF4J** for logging
-
+- **Docker** + **Docker Compose** for contanainerization
 ---
 
-## 🚀 Quick Start (Backend)
+## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Docker (Recommended)
+
+**Prerequisites:**
+- Docker
+- Docker Compose
+
+**Quick Start with Docker:**
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/jacek-kozakowski/springboot-hotel-management.git
+cd springboot-hotel-management
+```
+
+2. **Configure environment variables**
+If you are using gmail you can create your app password here (https://myaccount.google.com/apppasswords)
+**Option A: Using .env file (Recommended)**
+Copy the example file and update it with your values:
+```bash
+cp env.example .env
+```
+
+Edit `.env` file with your actual configuration:
+```dotenv
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+```
+
+**Option B: Edit docker-compose.yml directly**
+Edit `docker-compose.yml` and update these values:
+```yaml
+environment:
+  JWT_SECRET: your-super-secret-jwt-key-change-in-production
+  MAIL_USERNAME: your-email@gmail.com
+  MAIL_PASSWORD: your-app-password
+```
+
+3. **Run the application**
+```bash
+docker-compose up --build
+```
+
+4. **Access the application**
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8080
+- **Database**: localhost:5433
+
+
+**Useful Docker commands:**
+```bash
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs
+
+# Stop all services
+docker-compose down
+
+# Stop and remove data
+docker-compose down -v
+```
+
+### Option 2: Manual Installation
+
+**Prerequisites:**
 - Java 21
 - Maven 3.6+
 - PostgreSQL 14+
+- Node.js 20+ (for frontend)
 
-### Backend Installation
+**Backend Installation:**
 
 1. **Clone the repository**
 ```bash
@@ -180,7 +247,12 @@ A modern **React frontend** is included to demonstrate the backend functionality
 
 ### Installation
 
-Prerequisites: Node.js 18+ (recommended 20+), npm 9+
+**Option 1: With Docker (Recommended)**
+The frontend is automatically included when using Docker. See the Docker section above.
+
+**Option 2: Manual Installation**
+
+Prerequisites: Node.js 20+, npm 9+
 
 1. **Navigate to frontend directory:**
 ```bash
@@ -208,7 +280,29 @@ If you want to quickly test the admin panel locally (without creating a dedicate
 
 Table name is `users` and the `role` column stores enum values as strings (`USER`, `ADMIN`). You may also want to enable the account if it is not verified yet.
 
-Run this SQL (adjust the identifier in the WHERE clause):
+### With Docker
+
+```bash
+# Connect to PostgreSQL container
+docker exec -it hotel_db psql -U postgres -d hotel_db
+
+# Run SQL commands
+```
+
+```sql
+-- Promote by email
+UPDATE users
+SET role = 'ADMIN', enabled = TRUE
+WHERE email = 'tester@example.com';
+
+-- Or promote by ID
+UPDATE users
+SET role = 'ADMIN', enabled = TRUE
+WHERE id = 1;
+```
+
+### Manual Installation
+
 ```bash
 psql -U postgres -d hotel_db
 ```

@@ -76,3 +76,5 @@ frontend/*.local
 .classpath
 .project
 *.iml
+
+.env
